@@ -1,4 +1,4 @@
-import 'package:rick_and_morty_wiki/domain/models/character.dart';
+import 'package:rick_and_morty_wiki/domain/entities/character.dart';
 
 import 'location.dart';
 
@@ -11,6 +11,7 @@ class Character extends CharacterEntity {
     required super.type,
     required super.gender,
     required super.location,
+    required super.image,
     required super.episode,
     required super.url,
     super.isFavorite,
@@ -24,21 +25,23 @@ class Character extends CharacterEntity {
     'type': type,
     'gender': gender,
     'location': location,
+    'image': image,
     'episode': episode,
     'url': url,
     'is_favorite': isFavorite,
   };
 
   factory Character.fromJson(Map<String, dynamic> json) => Character(
-    id: json['id'] as int,
-    name: json['name'],
-    status: json['status'],
-    species: json['species'],
-    type: json['type'],
-    gender: json['gender'],
-    location: Location.fromJson(json['location'] as Map<String, dynamic>),
-    episode: json['episode'],
-    url: json['url'],
-    isFavorite: json['is_favorite'] ?? false
+      id: json['id'] as int,
+      name: json['name'],
+      status: json['status'],
+      species: json['species'],
+      type: json['type'],
+      gender: json['gender'],
+      location: Location.fromJson(json['location'] as Map<String, dynamic>),
+      image: json['image'],
+      episode: (json['episode'] as List<dynamic>).whereType<String>().toList(),
+      url: json['url'],
+      isFavorite: json['is_favorite'] ?? false
   );
 }

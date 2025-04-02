@@ -8,6 +8,7 @@ class CharacterEntity{
   final String type;
   final String gender;
   final Location location;
+  final String image;
   final List<String> episode;
   final String url;
   final bool? isFavorite;
@@ -20,6 +21,7 @@ class CharacterEntity{
    required this.type,
    required this.gender,
    required this.location,
+   required this.image,
    required this.episode,
    required this.url,
     this.isFavorite = false,

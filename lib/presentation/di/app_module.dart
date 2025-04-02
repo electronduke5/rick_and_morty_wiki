@@ -14,15 +14,19 @@ class AppModule {
     _provided = true;
   }
 
-  void _provideLocationRepository() =>
-      GetIt.instance.registerSingleton(LocationRepositoryImpl());
+  void _provideLocationRepository() {
+    GetIt.instance.registerSingleton(LocationRepositoryImpl());
+  }
 
-  static LocationRepository getLocationRepository() =>
-      GetIt.instance.get<LocationRepositoryImpl>();
+  static LocationRepository getLocationRepository() {
+    return GetIt.instance.get<LocationRepositoryImpl>();
+  }
 
-  void _provideCharacterRepository() =>
-      GetIt.instance.registerSingleton(LocationRepositoryImpl());
+  void _provideCharacterRepository() {
+    GetIt.instance.registerSingleton(CharacterRepositoryImpl());
+  }
 
-  static CharacterRepository getCharacterRepository() =>
-      GetIt.instance.get<CharacterRepositoryImpl>();
+  static CharacterRepository getCharacterRepository() {
+    return GetIt.instance.get<CharacterRepositoryImpl>();
+  }
 }

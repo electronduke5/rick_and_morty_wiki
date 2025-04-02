@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:rick_and_morty_wiki/data/utils/api_const_urls.dart';
+import 'package:rick_and_morty_wiki/data/sources/api_const_urls.dart';
 
 mixin ApiService<T extends Object> {
   abstract String apiRoute;
@@ -26,7 +26,7 @@ mixin ApiService<T extends Object> {
       throw HttpException(response.data);
     }
 
-    final jsonList = response.data as List<dynamic>;
+    final jsonList = response.data['results'] as List<dynamic>;
     return jsonList.map((e) => fromJson(e)).toList();
   }
 

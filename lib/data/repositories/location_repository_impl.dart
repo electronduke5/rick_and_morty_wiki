@@ -1,8 +1,8 @@
 import 'package:rick_and_morty_wiki/data/api_service.dart';
-import 'package:rick_and_morty_wiki/data/utils/api_const_urls.dart';
 import 'package:rick_and_morty_wiki/domain/repositories/location_repository.dart';
 
 import '../models/location.dart';
+import '../sources/api_const_urls.dart';
 
 class LocationRepositoryImpl
     with ApiService<Location>

@@ -1,32 +1,32 @@
 import 'package:flutter/material.dart';
 
+import '../../data/models/character.dart';
+
 class CharacterCard extends StatelessWidget {
-  const CharacterCard({super.key});
+  const CharacterCard(this.character, {super.key});
+
+  final Character? character;
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: 6,
-      itemBuilder: (context, index) {
-        return SizedBox(
-          height: 300,
-          width: 150,
-          child: Card(
-            child: Column(
-              children: [
-                Expanded(
-                  child: Image.network(
+    return SizedBox(
+      height: 300,
+      width: 150,
+      child: Card(
+        child: Column(
+          children: [
+            Expanded(
+              child: Image.network(
+                character?.image ??
                     'https://rickandmortyapi.com/api/character/avatar/1.jpeg',
-                  ),
-                ),
-                Text('Toxic Rick'),
-                Text('Dead'),
-                Text('Rick\'s Toxic Side'),
-              ],
+              ),
             ),
-          ),
-        );
-      },
+            Text(character?.name ?? 'NAME'),
+            Text(character?.gender ?? 'GENDER'),
+            Text(character?.status ?? 'STATUS'),
+          ],
+        ),
+      ),
     );
   }
 }
