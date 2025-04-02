@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:rick_and_morty_wiki/presentation/characters_page.dart';
+import 'package:rick_and_morty_wiki/presentation/di/app_module.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  AppModule().provideDependencies();
   runApp(const MyApp());
 }
 

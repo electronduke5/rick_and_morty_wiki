@@ -5,18 +5,18 @@ abstract class ApiState<T extends Object> {
   const ApiState({this.item, this.message});
 }
 
-class IdleStatus<T extends Object> extends ApiState<T> {
-  const IdleStatus();
+class IdleState<T extends Object> extends ApiState<T> {
+  const IdleState();
 }
 
-class LoadingStatus<T extends Object> extends ApiState<T> {
-  LoadingStatus();
+class LoadingState<T extends Object> extends ApiState<T> {
+  LoadingState();
 }
 
-class LoadedStatus<T extends Object> extends ApiState<T> {
-  LoadedStatus(T? item) : super(item: item);
+class LoadedState<T extends Object> extends ApiState<T> {
+  LoadedState(T? item) : super(item: item);
 }
 
-class FailedStatus<T extends Object> extends ApiState<T> {
-  FailedStatus(String? message) : super(message: message);
+class FailedState<T extends Object> extends ApiState<T> {
+  FailedState(String? message) : super(message: message);
 }
