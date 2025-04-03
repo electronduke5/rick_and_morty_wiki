@@ -47,12 +47,33 @@ class CharacterCubit extends Cubit<CharacterState> {
     }
   }
 
-  Future<List<Character>> loadFavourites() async =>
-      await _repository.getFavouriteCharacters();
+  Future<List<Character>> loadFavorites() async {
+    emit(state.copyWith(getFavoritesState: LoadingState()));
 
-  Future addToFavourites(Character character) async =>
-      await _repository.addToFavourites(character);
+    try {
+      final favorites = await _repository.getFavoriteCharacters();
+      emit(state.copyWith(
+        getFavoritesState: LoadedState(favorites),
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        getFavoritesState: FailedState(e.toString()),
+      ));
+    }
+    return await _repository.getFavoriteCharacters();
+  }
 
-  Future removeToFavourites(int id) async =>
-      await _repository.removeToFavourites(id);
+  Stream<List<Character>> watchFavorites() {
+    return _repository.watchFavorites();
+  }
+
+  Future addToFavourites(Character character) async {
+    await _repository.addToFavourites(character);
+    await loadFavorites();
+  }
+
+  Future removeFromFavourites(int id) async {
+    await _repository.removeToFavourites(id);
+    await loadFavorites();
+  }
 }

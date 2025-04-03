@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rick_and_morty_wiki/presentation/cubits/api_state.dart';
 import 'package:rick_and_morty_wiki/presentation/cubits/character_cubit/character_cubit.dart';
-import 'package:rick_and_morty_wiki/presentation/widgets/character_card.dart';
 
+import '../widgets/character_list_view.dart';
 
 class CharactersScreen extends StatefulWidget {
   const CharactersScreen({super.key});
@@ -61,7 +61,10 @@ class _CharactersScreenState extends State<CharactersScreen> {
                     }
                     return Stack(
                       children: [
-                        _buildCharacterListView(state),
+                        CharacterCardsListView(
+                          scrollController: _scrollController,
+                          characters: state.getCharactersState.item!,
+                        ),
                         if (currentState is PartiallyLoadedState)
                           Positioned(
                             bottom: 20,
@@ -83,32 +86,5 @@ class _CharactersScreenState extends State<CharactersScreen> {
     );
   }
 
-  ListView _buildCharacterListView(CharacterState state) {
-    return ListView.builder(
-      controller: _scrollController,
-      itemCount: (state.getCharactersState.item!.length / 2)
-          .ceil(),
-      itemBuilder: (context, rowIndex) {
-        final firstItemIndex = rowIndex * 2;
-        final secondItemIndex = firstItemIndex + 1;
-        return Row(
-          children: [
-            Expanded(
-              child: CharacterCard(state.getCharactersState
-                  .item?[firstItemIndex],),
-            ),
-
-            if (secondItemIndex <
-                state.getCharactersState.item!.length)
-              Expanded(
-                child: CharacterCard(
-                  state.getCharactersState
-                      .item?[secondItemIndex],
-                ),
-              ),
-          ],
-        );
-      },
-    );
-  }
 }
+

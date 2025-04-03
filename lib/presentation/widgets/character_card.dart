@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rick_and_morty_wiki/presentation/cubits/character_cubit/character_cubit.dart';
 
 import '../../data/models/character.dart';
 
@@ -52,7 +54,7 @@ class CharacterCard extends StatelessWidget {
                         ),
                       ]),
                   _buildStatusPin(),
-                  _buildFavoriteButton(context),
+                  _buildFavoriteButton(context, character?.isFavorite ?? false),
                 ],
               ),
             ),
@@ -61,19 +63,28 @@ class CharacterCard extends StatelessWidget {
     );
   }
 
-  Positioned _buildFavoriteButton(BuildContext context) {
+  Positioned _buildFavoriteButton(BuildContext context, bool isFavorite) {
     return Positioned(bottom: 1,
       right: 1,
       child: IconButton(
         icon: Icon(
-          Icons.star_outline,
+          isFavorite ? Icons.star : Icons.star_outline,
           color: Theme
               .of(context)
               .primaryColor,
           size: 35,
         ),
         onPressed: () {
-          //TODO: Добавление в избранное
+          if (isFavorite) {
+            context
+                .read<CharacterCubit>()
+                .removeFromFavourites(character!.id);
+          } else {
+            context
+                .read<CharacterCubit>()
+                .addToFavourites(character!);
+          }
+
         },
       ),
     );

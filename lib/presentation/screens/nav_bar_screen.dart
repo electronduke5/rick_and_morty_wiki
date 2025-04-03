@@ -28,9 +28,16 @@ class _NavBarScreenState extends State<NavBarScreen> {
                     ? BlocProvider<CharacterCubit>(
                       create:
                           (context) => CharacterCubit()..loadAllCharacters(),
-                      child: CharactersScreen(key: ValueKey('characters')),
+                  child: CharactersScreen(key: ValueKey('characters'),),
                     )
-                    : FavoritesScreen(key: ValueKey('favorites')),
+                    : BlocProvider<CharacterCubit>(
+                  create:
+                      (context) =>
+                  CharacterCubit(),
+                  child: FavoritesScreen(key: ValueKey('favorites'),
+                  ),
+                ),
+
             transitionBuilder: (child, animation) {
               return FadeTransition(opacity: animation, child: child);
             },
