@@ -8,7 +8,9 @@ abstract class CharacterRepository {
 
   Future addToFavourites(Character character);
 
-  Future removeToFavourites(int id);
+  Future removeFromFavourites(int id);
 
   Stream<List<Character>> watchFavorites();
+
+  Future<Set<int>> getFavoritesIds();
 }

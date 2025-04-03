@@ -29,7 +29,14 @@ class CharacterCubit extends Cubit<CharacterState> {
         _hasReachedMax = true;
         return;
       }
-      _allCharacters.addAll(newCharacters);
+      Set<int> favoritesIds = await _repository.getFavoritesIds();
+      final updatedCharacters = newCharacters.map((character) {
+        return character.copyWith(
+          isFavorite: favoritesIds.contains(character.id),
+        );
+      }).toList();
+
+      _allCharacters.addAll(updatedCharacters);
       emit(state.copyWith(
           getCharactersState: LoadedState(List.from(_allCharacters))));
     } catch (e) {
@@ -67,13 +74,30 @@ class CharacterCubit extends Cubit<CharacterState> {
     return _repository.watchFavorites();
   }
 
-  Future addToFavourites(Character character) async {
-    await _repository.addToFavourites(character);
-    await loadFavorites();
+  Future<void> toggleFavorite(Character character) async {
+    try {
+      if (character.isFavorite!) {
+        await _repository.removeFromFavourites(character.id);
+        await loadFavorites();
+      } else {
+        await _repository.addToFavourites(character);
+      }
+
+      // Обновляем состояние в списке
+      final updatedCharacters = state.getCharactersState.item?.map((c) {
+        return c.id == character.id
+            ? c.copyWith(isFavorite: !c.isFavorite!)
+            : c;
+      }).toList();
+
+      emit(state.copyWith(
+        getCharactersState: LoadedState(updatedCharacters ?? []),
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        getCharactersState: FailedState('Failed to toggle favorite'),
+      ));
+    }
   }
 
-  Future removeFromFavourites(int id) async {
-    await _repository.removeToFavourites(id);
-    await loadFavorites();
-  }
 }

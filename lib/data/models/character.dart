@@ -44,4 +44,30 @@ class Character extends CharacterEntity {
       url: json['url'],
       isFavorite: json['is_favorite'] ?? false
   );
+
+  Character copyWith({int? id,
+    String? name,
+    String? status,
+    String? species,
+    String? type,
+    String? gender,
+    Location? location,
+    String? image,
+    List<String>? episode,
+    String? url,
+    bool? isFavorite,
+  }) =>
+      Character(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        status: status ?? this.status,
+        species: species ?? this.species,
+        type: type ?? this.type,
+        gender: gender ?? this.gender,
+        location: location ?? this.location,
+        image: image ?? this.image,
+        episode: episode ?? this.episode,
+        url: url ?? this.url,
+        isFavorite: isFavorite ?? this.isFavorite,
+      );
 }

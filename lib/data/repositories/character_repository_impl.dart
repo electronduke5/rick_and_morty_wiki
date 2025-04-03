@@ -47,7 +47,6 @@ class CharacterRepositoryImpl
     Box<HiveCharacter> favoritesBox = Hive.box<HiveCharacter>(HiveBox.favorites);
     if (!favoritesBox.containsKey(character.id)) {
       final hiveChar = HiveCharacter.fromEntity(character, isFavorite: true);
-      print('Adding to favorites: ${hiveChar.isFavorite}');
 
       await favoritesBox.put(hiveChar.id, hiveChar);
     }
@@ -61,8 +60,16 @@ class CharacterRepositoryImpl
   }
 
    @override
-  Future removeToFavourites(int id) async {
+   Future removeFromFavourites(int id) async {
     Box<HiveCharacter> favoritesBox = Hive.box<HiveCharacter>(HiveBox.favorites);
     favoritesBox.delete(id);
+   }
+
+  @override
+  Future<Set<int>> getFavoritesIds() async {
+    final favoritesBox = await Hive.openBox<HiveCharacter>(HiveBox.favorites);
+    return favoritesBox.keys
+        .whereType<int>()
+        .toSet();
   }
 }

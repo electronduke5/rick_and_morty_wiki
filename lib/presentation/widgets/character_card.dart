@@ -39,7 +39,7 @@ class CharacterCard extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(left: 5.0),
                           child: Text(
-                            character?.name ?? 'NAME',
+                            '${character?.name} id:${character?.id}' ?? 'NAME',
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -66,25 +66,21 @@ class CharacterCard extends StatelessWidget {
   Positioned _buildFavoriteButton(BuildContext context, bool isFavorite) {
     return Positioned(bottom: 1,
       right: 1,
-      child: IconButton(
-        icon: Icon(
-          isFavorite ? Icons.star : Icons.star_outline,
-          color: Theme
-              .of(context)
-              .primaryColor,
-          size: 35,
-        ),
-        onPressed: () {
-          if (isFavorite) {
-            context
-                .read<CharacterCubit>()
-                .removeFromFavourites(character!.id);
-          } else {
-            context
-                .read<CharacterCubit>()
-                .addToFavourites(character!);
-          }
-
+      child: BlocBuilder<CharacterCubit, CharacterState>(
+        builder: (context, state) {
+          return IconButton(
+            icon: Icon(
+              isFavorite ? Icons.star : Icons.star_outline,
+              color: Theme
+                  .of(context)
+                  .primaryColor,
+              size: 35,
+            ),
+            onPressed: () {
+              context.read<CharacterCubit>()
+                  .toggleFavorite(character!);
+            },
+          );
         },
       ),
     );
