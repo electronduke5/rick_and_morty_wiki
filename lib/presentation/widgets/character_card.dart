@@ -9,24 +9,49 @@ class CharacterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 300,
-      width: 150,
-      child: Card(
-        child: Column(
-          children: [
-            Expanded(
-              child: Image.network(
-                character?.image ??
-                    'https://rickandmortyapi.com/api/character/avatar/1.jpeg',
+    return LayoutBuilder(
+        builder: (context, constraints) {
+          return SizedBox(
+            height: constraints.maxWidth * 4 / 3 + 30,
+            child: Card(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: constraints.maxWidth,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(10)),
+                      image: DecorationImage(
+                        image: NetworkImage(
+                          character?.image ??
+                              'https://rickandmortyapi.com/api/character/avatar/1.jpeg',
+                        ),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 5.0),
+                    child: Text(
+                      character?.name ?? 'NAME',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 5.0, bottom: 5),
+                    child: Text(character?.gender ?? 'GENDER'),
+                  ),
+                ],
               ),
             ),
-            Text(character?.name ?? 'NAME'),
-            Text(character?.gender ?? 'GENDER'),
-            Text(character?.status ?? 'STATUS'),
-          ],
-        ),
-      ),
+          );
+        }
     );
   }
 }

@@ -29,13 +29,7 @@ class CharactersScreen extends StatelessWidget {
                         return Center(child: Text(state.getCharactersState
                             .message ?? 'Error'));
                       case LoadedState _ :
-                        return ListView.builder(
-                          itemCount: state.getCharactersState.item?.length ?? 0,
-                          itemBuilder: (context, index) {
-                            return CharacterCard(state.getCharactersState
-                                .item?[index]);
-                          },
-                        );
+                        return _buildCharacterListView(state);
                       default:
                         return Text(
                             state.getCharactersState.message ??
@@ -48,6 +42,34 @@ class CharactersScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  ListView _buildCharacterListView(CharacterState state) {
+    return ListView.builder(
+      itemCount: (state.getCharactersState.item!.length / 2)
+          .ceil(),
+      itemBuilder: (context, rowIndex) {
+        final firstItemIndex = rowIndex * 2;
+        final secondItemIndex = firstItemIndex + 1;
+        return Row(
+          children: [
+            Expanded(
+              child: CharacterCard(state.getCharactersState
+                  .item?[firstItemIndex],),
+            ),
+
+            if (secondItemIndex <
+                state.getCharactersState.item!.length)
+              Expanded(
+                child: CharacterCard(
+                  state.getCharactersState
+                      .item?[secondItemIndex],
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
