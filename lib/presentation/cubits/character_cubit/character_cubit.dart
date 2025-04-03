@@ -8,14 +8,30 @@ part 'character_state.dart';
 
 class CharacterCubit extends Cubit<CharacterState> {
   CharacterCubit() : super(const CharacterState());
+  final List<Character> _allCharacters = [];
+  bool _hasReachedMax = false;
+
 
   final _repository = AppModule.getCharacterRepository();
 
   Future loadAllCharacters({int page = 1}) async {
-    emit(state.copyWith(getCharactersState: LoadingState()));
+    if (page == 1) {
+      emit(state.copyWith(getCharactersState: LoadingState()));
+    } else {
+      emit(state.copyWith(
+          getCharactersState: PartiallyLoadedState(List.from(_allCharacters))));
+    }
+
     try {
-      List<Character> characters = await _repository.getCharacters(page: page);
-      emit(state.copyWith(getCharactersState: LoadedState(characters)));
+      List<Character> newCharacters = await _repository.getCharacters(
+          page: page);
+      if (newCharacters.isEmpty) {
+        _hasReachedMax = true;
+        return;
+      }
+      _allCharacters.addAll(newCharacters);
+      emit(state.copyWith(
+          getCharactersState: LoadedState(List.from(_allCharacters))));
     } catch (e) {
       emit(state.copyWith(getCharactersState: FailedState(e.toString())));
     }

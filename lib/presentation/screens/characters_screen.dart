@@ -5,8 +5,34 @@ import 'package:rick_and_morty_wiki/presentation/cubits/character_cubit/characte
 import 'package:rick_and_morty_wiki/presentation/widgets/character_card.dart';
 
 
-class CharactersScreen extends StatelessWidget {
+class CharactersScreen extends StatefulWidget {
   const CharactersScreen({super.key});
+
+  @override
+  State<CharactersScreen> createState() => _CharactersScreenState();
+}
+
+class _CharactersScreenState extends State<CharactersScreen> {
+  final _scrollController = ScrollController();
+
+  bool _isLoading = false;
+  int page = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_loadMore);
+  }
+
+  void _loadMore() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent && !_isLoading) {
+      _isLoading = true;
+      page++;
+      context.read<CharacterCubit>().loadAllCharacters(page: page);
+      _isLoading = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,21 +46,33 @@ class CharactersScreen extends StatelessWidget {
               Expanded(
                 child: BlocBuilder<CharacterCubit, CharacterState>(
                   builder: (context, state) {
-                    switch (state.getCharactersState) {
-                      case IdleState _:
-                        return const Center(child: CircularProgressIndicator());
-                      case LoadingState _:
-                        return const Center(child: CircularProgressIndicator());
-                      case FailedState _:
-                        return Center(child: Text(state.getCharactersState
-                            .message ?? 'Error'));
-                      case LoadedState _ :
-                        return _buildCharacterListView(state);
-                      default:
-                        return Text(
-                            state.getCharactersState.message ??
-                                'default: ${state.getCharactersState}');
+                    final currentState = state.getCharactersState;
+
+                    if (currentState is LoadingState && page == 1) {
+                      return const Center(child: CircularProgressIndicator());
                     }
+                    final characters = currentState is PartiallyLoadedState
+                        ? currentState.item
+                        : (currentState is LoadedState ? currentState.item : [
+                    ]);
+
+                    if (characters!.isEmpty && currentState is! LoadingState) {
+                      return const Center(child: Text('No characters found'));
+                    }
+                    return Stack(
+                      children: [
+                        _buildCharacterListView(state),
+                        if (currentState is PartiallyLoadedState)
+                          Positioned(
+                            bottom: 20,
+                            left: 0,
+                            right: 0,
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                      ],
+                    );
                   },
                 ),
               ),
@@ -47,6 +85,7 @@ class CharactersScreen extends StatelessWidget {
 
   ListView _buildCharacterListView(CharacterState state) {
     return ListView.builder(
+      controller: _scrollController,
       itemCount: (state.getCharactersState.item!.length / 2)
           .ceil(),
       itemBuilder: (context, rowIndex) {

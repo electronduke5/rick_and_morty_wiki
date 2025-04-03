@@ -17,6 +17,10 @@ class LoadedState<T extends Object> extends ApiState<T> {
   LoadedState(T? item) : super(item: item);
 }
 
+class PartiallyLoadedState<T extends Object> extends ApiState<T> {
+  PartiallyLoadedState(T? item) : super(item: item);
+}
+
 class FailedState<T extends Object> extends ApiState<T> {
   FailedState(String? message) : super(message: message);
 }
