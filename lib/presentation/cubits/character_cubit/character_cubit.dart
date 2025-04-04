@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rick_and_morty_wiki/data/cache_service.dart';
 import 'package:rick_and_morty_wiki/presentation/cubits/api_state.dart';
 
 import '../../../data/models/character.dart';
@@ -27,12 +28,14 @@ class CharacterCubit extends Cubit<CharacterState> {
       List<Character> newCharacters = await _repository.getCharacters(
           page: currentPage);
 
+
       Set<int> favoritesIds = await _repository.getFavoritesIds();
       final updatedCharacters = newCharacters.map((character) {
         return character.copyWith(
           isFavorite: favoritesIds.contains(character.id),
         );
       }).toList();
+      await CacheService.cacheCharacters(updatedCharacters);
       final newIds = newCharacters.map((c) => c.id).toSet();
       _allCharacters.removeWhere((c) => newIds.contains(c.id));
       _allCharacters.addAll(updatedCharacters);
@@ -41,8 +44,18 @@ class CharacterCubit extends Cubit<CharacterState> {
           getCharactersState: LoadedState(List.from(_allCharacters)),
           page: currentPage));
     } catch (e) {
-      emit(state.copyWith(
-          getCharactersState: FailedState(e.toString()), page: currentPage));
+      final cached = CacheService.getCachedCharacters();
+
+      if (cached.isNotEmpty) {
+        emit(state.copyWith(
+            getCharactersState: LoadedState(List.from(cached)),
+            page: currentPage));
+      }
+      else {
+        emit(state.copyWith(
+            getCharactersState: FailedState(e.toString()), page: currentPage));
+      }
+
     }
   }
 
@@ -132,4 +145,38 @@ class CharacterCubit extends Cubit<CharacterState> {
     }
   }
 
+}
+
+enum CacheStrategy {
+  cacheFirst, // Сначала кеш, потом сеть
+  networkFirst, // Сначала сеть, потом кеш
+  cacheOnly, // Только кеш
+}
+
+Future<List<Character>> getData({
+  CacheStrategy strategy = CacheStrategy.cacheFirst,
+}) async {
+  switch (strategy) {
+    case CacheStrategy.cacheFirst:
+      try {
+        final cached = CacheService.getCachedCharacters();
+        if (cached.isNotEmpty) return cached;
+        return await CharacterCubit().loadAllCharacters(page: 1);
+      } catch (e) {
+        throw e;
+      }
+
+    case CacheStrategy.networkFirst:
+      try {
+        final data = await CharacterCubit().loadAllCharacters(page: 1);
+        return data;
+      } catch (e) {
+        final cached = CacheService.getCachedCharacters();
+        if (cached.isNotEmpty) return cached;
+        throw e;
+      }
+
+    case CacheStrategy.cacheOnly:
+      return CacheService.getCachedCharacters();
+  }
 }

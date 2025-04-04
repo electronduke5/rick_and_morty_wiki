@@ -1,10 +1,24 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:rick_and_morty_wiki/data/sources/api_const_urls.dart';
 
 mixin ApiService<T extends Object> {
   abstract String apiRoute;
+
+  final _dio =
+      Dio()
+        ..interceptors.add(
+          DioCacheInterceptor(
+            options: CacheOptions(
+              store: MemCacheStore(),
+              policy: CachePolicy.forceCache,
+              maxStale: const Duration(days: 7),
+              priority: CachePriority.high,
+            ),
+          ),
+        );
 
   BaseOptions getOptions({Map<String, dynamic>? params}) => BaseOptions(
     headers: {'Accept': 'application/json'},
@@ -17,9 +31,10 @@ mixin ApiService<T extends Object> {
     Map<String, dynamic>? params,
     dynamic id,
   }) async {
-    final dio = Dio(getOptions(params: params));
-    final response = await dio.get(
+    final response = await _dio.get(
       '${ApiConstUrl.baseUrl}$apiRoute/${id ?? ''}',
+      queryParameters: params,
+      options: Options(extra: {'refresh': false}),
     );
 
     if (response.statusCode != HttpStatus.ok) {
