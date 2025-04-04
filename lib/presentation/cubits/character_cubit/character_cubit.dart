@@ -60,13 +60,14 @@ class CharacterCubit extends Cubit<CharacterState> {
     }
   }
 
-  Future<List<Character>> loadFavorites() async {
+  Future<List<Character>> loadFavorites({int? sortType}) async {
     emit(state.copyWith(getFavoritesState: LoadingState()));
 
     try {
       final favorites = await _repository.getFavoriteCharacters();
+      final sortedFavorites = _sortFavorites(favorites, sortType);
       emit(state.copyWith(
-        getFavoritesState: LoadedState(favorites),
+        getFavoritesState: LoadedState(sortedFavorites),
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -78,6 +79,31 @@ class CharacterCubit extends Cubit<CharacterState> {
 
   Stream<List<Character>> watchFavorites() {
     return _repository.watchFavorites();
+  }
+
+  List<Character> _sortFavorites(List<Character> favorites, int? sortType) {
+    switch (sortType) {
+      case 1: // default
+        return favorites;
+      case 2: // по имени
+        return favorites..sort((a, b) => a.name.compareTo(b.name));
+      case 3: // сначала живые
+        return favorites
+          ..sort((a, b) {
+            if (a.status == 'Alive' && b.status != 'Alive') return -1;
+            if (a.status != 'Alive' && b.status == 'Alive') return 1;
+            return a.name.compareTo(b.name);
+          });
+      case 4: // сначала мертвые
+        return favorites
+          ..sort((a, b) {
+            if (a.status == 'Dead' && b.status != 'Dead') return -1;
+            if (a.status != 'Dead' && b.status == 'Dead') return 1;
+            return a.name.compareTo(b.name);
+          });
+      default:
+        return favorites;
+    }
   }
 
   Future<void> toggleFavorite(Character character) async {

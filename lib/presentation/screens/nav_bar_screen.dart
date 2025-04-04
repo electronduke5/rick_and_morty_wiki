@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rick_and_morty_wiki/presentation/cubits/character_cubit/character_cubit.dart';
 
+import '../widgets/appbar.dart';
 import '../widgets/nav_bar_item.dart';
 import 'characters_screen.dart';
 import 'favorites_screen.dart';
@@ -19,6 +20,7 @@ class _NavBarScreenState extends State<NavBarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: Appbar.getAppBar(),
       body: Stack(
         children: [
           AnimatedSwitcher(
