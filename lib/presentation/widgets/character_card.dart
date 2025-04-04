@@ -39,7 +39,7 @@ class CharacterCard extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(left: 5.0),
                           child: Text(
-                            '${character?.name} id:${character?.id}' ?? 'NAME',
+                            character?.name ?? 'NAME',
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,

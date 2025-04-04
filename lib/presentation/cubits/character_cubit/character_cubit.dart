@@ -9,39 +9,45 @@ part 'character_state.dart';
 class CharacterCubit extends Cubit<CharacterState> {
   CharacterCubit() : super(const CharacterState());
   final List<Character> _allCharacters = [];
-  bool _hasReachedMax = false;
-
 
   final _repository = AppModule.getCharacterRepository();
 
-  Future loadAllCharacters({int page = 1}) async {
-    if (page == 1) {
-      emit(state.copyWith(getCharactersState: LoadingState()));
+  Future loadAllCharacters({int? page}) async {
+    final currentPage = page ?? state.page;
+    if (currentPage == 1) {
+      emit(state.copyWith(
+          getCharactersState: LoadingState(), page: currentPage));
     } else {
       emit(state.copyWith(
-          getCharactersState: PartiallyLoadedState(List.from(_allCharacters))));
+          getCharactersState: PartiallyLoadedState(List.from(_allCharacters)),
+          page: currentPage));
     }
 
     try {
       List<Character> newCharacters = await _repository.getCharacters(
-          page: page);
-      if (newCharacters.isEmpty) {
-        _hasReachedMax = true;
-        return;
-      }
+          page: currentPage);
+
       Set<int> favoritesIds = await _repository.getFavoritesIds();
       final updatedCharacters = newCharacters.map((character) {
         return character.copyWith(
           isFavorite: favoritesIds.contains(character.id),
         );
       }).toList();
-
+      final newIds = newCharacters.map((c) => c.id).toSet();
+      _allCharacters.removeWhere((c) => newIds.contains(c.id));
       _allCharacters.addAll(updatedCharacters);
+
       emit(state.copyWith(
-          getCharactersState: LoadedState(List.from(_allCharacters))));
+          getCharactersState: LoadedState(List.from(_allCharacters)),
+          page: currentPage));
     } catch (e) {
-      emit(state.copyWith(getCharactersState: FailedState(e.toString())));
+      emit(state.copyWith(
+          getCharactersState: FailedState(e.toString()), page: currentPage));
     }
+  }
+
+  Future setPage(int page) async {
+    state.copyWith(page: page);
   }
 
   Future loadCharacter(int id) async {

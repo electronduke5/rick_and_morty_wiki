@@ -18,21 +18,35 @@ class _CharactersScreenState extends State<CharactersScreen> {
   final _scrollController = ScrollController();
 
   bool _isLoading = false;
-  int page = 1;
+  late int page;
 
   @override
   void initState() {
     super.initState();
+    page = context
+        .read<CharacterCubit>()
+        .state
+        .page;
     _scrollController.addListener(_loadMore);
   }
 
-  void _loadMore() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent && !_isLoading) {
-      _isLoading = true;
-      page++;
-      context.read<CharacterCubit>().loadAllCharacters(page: page);
-      _isLoading = false;
+  void _loadMore() async {
+    if (_scrollController.position.extentAfter < 500 && !_isLoading) {
+      setState(() => _isLoading = true);
+      await context.read<CharacterCubit>().setPage(page++);
+      try {
+        await context.read<CharacterCubit>().loadAllCharacters(page: page);
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Ошибка загрузки: ${e.toString()}')),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+      }
     }
   }
 
