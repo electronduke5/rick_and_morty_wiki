@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rick_and_morty_wiki/presentation/cubits/api_state.dart';
 import 'package:rick_and_morty_wiki/presentation/cubits/character_cubit/character_cubit.dart';
 
+import '../di/theme_provider.dart';
 import '../widgets/character_list_view.dart';
 
 class CharactersScreen extends StatefulWidget {
@@ -37,12 +39,34 @@ class _CharactersScreenState extends State<CharactersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          Consumer(
+            builder: (context, ref, child) {
+              final theme = ref.watch(themeModeProvider);
+              return IconButton(
+                icon: Icon(
+                  theme == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode,
+                ),
+                onPressed: () {
+                  ref
+                      .read(themeModeProvider.notifier)
+                      .state =
+                  theme == ThemeMode.light
+                      ? ThemeMode.dark
+                      : ThemeMode.light;
+                },
+              );
+            },
+          ),
+        ],
+        title: Image.asset('assets/images/RM_Logo.png', height: 60),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
           child: Column(
             children: [
-              Image.asset('assets/images/RM_Logo.png'),
               Expanded(
                 child: BlocBuilder<CharacterCubit, CharacterState>(
                   builder: (context, state) {

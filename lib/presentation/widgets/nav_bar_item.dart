@@ -26,7 +26,7 @@ class NavBarItem extends StatelessWidget {
         decoration: BoxDecoration(
           color:
               isActive
-                  ? Theme.of(context).primaryColor.withAlpha(25)
+                  ? Theme.of(context).colorScheme.primary.withAlpha(25)
                   : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
         ),
@@ -35,14 +35,14 @@ class NavBarItem extends StatelessWidget {
           children: [
             Icon(
               isActive ? activeIcon : icon,
-              color: isActive ? Theme.of(context).primaryColor : Colors.grey,
+              color: isActive ? Theme.of(context).colorScheme.primary : Colors.grey,
               size: 24,
             ),
             SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
-                color: isActive ? Theme.of(context).primaryColor : Colors.grey,
+                color: isActive ? Theme.of(context).colorScheme.primary : Colors.grey,
                 fontSize: 12,
                 fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
               ),

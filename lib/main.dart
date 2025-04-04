@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rick_and_morty_wiki/data/sources/hive_names.dart';
 import 'package:rick_and_morty_wiki/presentation/di/app_module.dart';
+import 'package:rick_and_morty_wiki/presentation/di/color_schemes.dart';
+import 'package:rick_and_morty_wiki/presentation/di/theme_provider.dart';
 import 'package:rick_and_morty_wiki/presentation/screens/nav_bar_screen.dart';
 
 import 'domain/entities/hive_character.dart';
@@ -13,19 +16,20 @@ void main() async {
   Hive.registerAdapter(HiveCharacterAdapter());
   await Hive.openBox<HiveCharacter>(HiveBox.favorites);
 
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
+      themeMode: themeMode,
+      theme: ThemeDates.lightTheme,
+      darkTheme: ThemeDates.darkTheme,
       home: const NavBarScreen(),
     );
   }
